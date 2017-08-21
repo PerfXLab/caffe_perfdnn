@@ -178,7 +178,8 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES := cudart cublas curand
 endif
 
-LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5
+LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_serial_hl hdf5_serial
+#hdf5_hl hdf5
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -376,6 +377,13 @@ ifeq ($(BLAS), mkl)
 else ifeq ($(BLAS), open)
 	# OpenBLAS
 	LIBRARIES += openblas
+else ifeq ($(BLAS), perfdnn)
+	# PerfDNN
+	LIBRARIES += perfdnn
+	COMMON_FLAGS += -DUSE_PERFDNN
+	PERFDNNROOT ?= /opt/perfxlab/perfdnn
+	BLAS_INCLUDE ?= $(PERFDNNROOT)/include
+	BLAS_LIB ?= $(PERFDNNROOT)/lib
 else
 	# ATLAS
 	ifeq ($(LINUX), 1)

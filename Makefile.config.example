@@ -47,8 +47,9 @@ CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 # atlas for ATLAS (default)
 # mkl for MKL
 # open for OpenBlas
-BLAS := atlas
-# Custom (MKL/ATLAS/OpenBLAS) include and lib directories.
+# perfdnn for PerfDNN
+BLAS := perfdnn
+# Custom (MKL/ATLAS/OpenBLAS/PerfDNN) include and lib directories.
 # Leave commented to accept the defaults for your choice of BLAS
 # (which should work)!
 # BLAS_INCLUDE := /path/to/your/blas
