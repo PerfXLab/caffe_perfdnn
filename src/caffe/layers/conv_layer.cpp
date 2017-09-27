@@ -160,7 +160,11 @@ void ConvolutionLayer<Dtype>::Forward_cpu(
       const Dtype* weight = this->blobs_[0]->cpu_data();
       //CHECK(this->bias_term_);
 
-      Dtype* bias = (Dtype*)this->blobs_[1]->cpu_data();
+      Dtype* bias =NULL;
+      if(this->bias_term_)
+      {
+         bias = (Dtype*)this->blobs_[1]->cpu_data();
+      }
       //Dtype* bias = NULL;
       //std::cout << "my bias " << bias << std::endl;
   

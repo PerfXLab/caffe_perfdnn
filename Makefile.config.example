@@ -52,8 +52,8 @@ BLAS := perfdnn
 # Custom (MKL/ATLAS/OpenBLAS/PerfDNN) include and lib directories.
 # Leave commented to accept the defaults for your choice of BLAS
 # (which should work)!
-# BLAS_INCLUDE := /path/to/your/blas
-# BLAS_LIB := /path/to/your/blas
+	PERFDNNROOT ?= /path/to/your/perfdnnroot
+	BLASROOT ?= /path/to/your/blasroot
 
 # Homebrew puts openblas in a directory that is not on the standard search path
 # BLAS_INCLUDE := $(shell brew --prefix openblas)/include

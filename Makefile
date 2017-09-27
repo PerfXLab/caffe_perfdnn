@@ -374,16 +374,20 @@ ifeq ($(BLAS), mkl)
 	MKLROOT ?= /opt/intel/mkl
 	BLAS_INCLUDE ?= $(MKLROOT)/include
 	BLAS_LIB ?= $(MKLROOT)/lib $(MKLROOT)/lib/intel64
+
 else ifeq ($(BLAS), open)
 	# OpenBLAS
 	LIBRARIES += openblas
 else ifeq ($(BLAS), perfdnn)
 	# PerfDNN
 	LIBRARIES += perfdnn
+	LIBRARIES += perfblas
 	COMMON_FLAGS += -DUSE_PERFDNN
-	PERFDNNROOT ?= /opt/perfxlab/perfdnn
-	BLAS_INCLUDE ?= $(PERFDNNROOT)/include
-	BLAS_LIB ?= $(PERFDNNROOT)/lib
+	PERFDNN_INCLUDE ?= $(PERFDNNROOT)/include
+	PERFDNN_LIB ?= $(PERFDNNROOT)/lib
+
+  BLAS_INCLUDE ?= $(BLASROOT)/include 
+	BLAS_LIB ?=$(BLASROOT)/lib
 else
 	# ATLAS
 	ifeq ($(LINUX), 1)
@@ -410,7 +414,9 @@ else
 	endif
 endif
 INCLUDE_DIRS += $(BLAS_INCLUDE)
+INCLUDE_DIRS += $(PERFDNN_INCLUDE)
 LIBRARY_DIRS += $(BLAS_LIB)
+LIBRARY_DIRS += $(PERFDNN_LIB)
 
 LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
