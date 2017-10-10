@@ -22,7 +22,7 @@ enum perfdnn_status caffe_perfdnn_convolution_inference(
         const Dtype* kernel,
         Dtype* bias,
         Dtype* output,
-        pthreadpool_t threadpool,size_t group);
+        pthreadpool_t threadpool,size_t group,bool bias_term);
 
 
 template <>
@@ -39,7 +39,7 @@ enum perfdnn_status caffe_perfdnn_convolution_inference<double>(
         const double* kernel,
         double* bias,
         double* output,
-        pthreadpool_t threadpool, size_t group){
+        pthreadpool_t threadpool, size_t group,bool bias_term){
   return perfdnn_status_unsupported_algorithm;
 }
 
@@ -59,8 +59,8 @@ enum perfdnn_status caffe_perfdnn_convolution_inference<float>(
         const float* kernel,
         float* bias,
         float* output,
-        pthreadpool_t threadpool, size_t group){
-  return perfdnn_convolution_inference(algorithm, input_channels, output_channels, input_size, input_padding, kernel_size, output_subsampling, dilation, input, kernel, bias, output, threadpool, group);
+        pthreadpool_t threadpool, size_t group,bool bias_term){
+  return perfdnn_convolution_inference(algorithm, input_channels, output_channels, input_size, input_padding, kernel_size, output_subsampling, dilation, input, kernel, bias, output, threadpool, group,bias_term);
 }
 
 
@@ -160,11 +160,12 @@ void ConvolutionLayer<Dtype>::Forward_cpu(
       const Dtype* weight = this->blobs_[0]->cpu_data();
       //CHECK(this->bias_term_);
 
-      Dtype* bias =NULL;
+      Dtype* bias = NULL;
       if(this->bias_term_)
       {
-         bias = (Dtype*)this->blobs_[1]->cpu_data();
+          bias= (Dtype*)this->blobs_[1]->cpu_data();
       }
+      //Dtype* bias = (Dtype*)this->blobs_[1]->cpu_data();
       //Dtype* bias = NULL;
       //std::cout << "my bias " << bias << std::endl;
   
@@ -207,8 +208,6 @@ void ConvolutionLayer<Dtype>::Forward_cpu(
 	enum perfdnn_convolution_algorithm algorithm = perfdnn_convolution_algorithm_auto;
 	//enum perfdnn_convolution_algorithm algorithm = perfdnn_convolution_algorithm_wt8x8;
 	//enum perfdnn_convolution_algorithm algorithm = perfdnn_convolution_algorithm_im2col_gemm;
-	//enum perfdnn_convolution_algorithm algorithm = perfdnn_convolution_algorithm_ft8x8;
-	//enum perfdnn_convolution_algorithm algorithm = perfdnn_convolution_algorithm_ft16x16;
 	const struct perfdnn_size output_subsampling = {.width=this->stride_.cpu_data()[1], .height=this->stride_.cpu_data()[0]};
 	const struct perfdnn_size dilation = {.width=this->dilation_.cpu_data()[1], .height=this->dilation_.cpu_data()[0]};
 
@@ -216,12 +215,11 @@ void ConvolutionLayer<Dtype>::Forward_cpu(
 	//struct timeval conv_start, conv_end;
 	size_t group=this->group_;
 
-	//gettimeofday(&conv_start,NULL);
+  //gettimeofday(&conv_start,NULL);
       
 	for(int n=0; n<batch_size; n++){
-         
-	    const perfdnn_status status = caffe_perfdnn_convolution_inference(algorithm, input_channels, output_channels, input_size, input_padding, kernel_size, output_subsampling, dilation, bottom_data+n*this->bottom_dim_, weight, bias, top_data+n*this->top_dim_, NULL, group);
-	    //const perfdnn_status status = caffe_perfdnn_convolution_inference(algorithm, input_channels, output_channels, input_size, input_padding, kernel_size, output_subsampling, dilation, bottom_data+n*this->bottom_dim_, weight, bias, top_data+n*this->top_dim_, NULL);
+
+	    const perfdnn_status status = caffe_perfdnn_convolution_inference(algorithm, input_channels, output_channels, input_size, input_padding, kernel_size, output_subsampling, dilation, bottom_data+n*this->bottom_dim_, weight, bias, top_data+n*this->top_dim_, NULL, group,this->bias_term_);
 	    CHECK_EQ(perfdnn_status_success, status);
 
 	  }
